@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.10)
+project("实时传感器流水线")
+set(CMAKE_CXX_STANDRAD 11)
+set(CMAKE_CXX_STANDRAD_REQUIRED ON)
+add_executable(action src/main.cpp)
