@@ -44,3 +44,12 @@ class TaskDelayBuffer:public SensorTask{
     void callback(int msg)override{}
     ~TaskDelayBuffer()override{}
 };
+class Taskmanager{
+public:
+    void add(){}
+    void pop(){}
+    void callbackuse() {}
+    std::atomic<int>out{0};
+    vector<std::unique_ptr<std::atomic<int>>>b_n;
+    vector<SensorTask*>tasklist;
+};
