@@ -28,7 +28,7 @@ class Taskfilter:public SensorTask{
                 std::lock_guard<mutex> lock(mtx);
                 *p_out=*p_in+1;
                 *p_in=0;
-                cout<<"Taskfilter "<<key<<" "<<*p_out<<endl;
+                cout<<"write filter "<<key<<": "<<*p_out<<endl;
             }
             std::this_thread::sleep_for(std::chrono::microseconds(1));
         }
@@ -55,7 +55,7 @@ class TaskGain:public SensorTask{
                 std::lock_guard<mutex> lock(mtx);
                 *p_out=*p_in*k;
                 *p_in=0;
-                cout<<"TaskGain "<<key<<" "<<*p_out<<endl;
+                cout<<"wriet gain "<<key<<": "<<*p_out<<endl;
             }
             std::this_thread::sleep_for(std::chrono::microseconds(1));
         }
@@ -75,4 +75,35 @@ class TaskGain:public SensorTask{
         }
     }
     int k;
+};
+
+class TaskDelayBuffer:public SensorTask{
+    void run()override{
+        while(is){
+            if(*p_in!=0){
+                std::lock_guard<mutex> lock(mtx);
+                int t=*p_in;
+                *p_in=0;
+                *p_out=t;
+                cout<<"write delay "<<key<<": "<<*p_out<<endl;
+                std::this_thread::sleep_for(std::chrono::microseconds(1));
+                *p_out=t+1;
+                cout<<"write delay "<<key<<": "<<*p_out<<endl;
+            }
+            std::this_thread::sleep_for(std::chrono::microseconds(1));
+        }
+    }
+    void callback(int msg)override{
+        *p_in=msg;
+    }
+    ~TaskDelayBuffer()override{
+        stop();
+        if(running.joinable()){
+            running.join();
+        }
+        if(p_in!=nullptr&&p_out!=nullptr){
+            p_in=nullptr;
+            p_out=nullptr;
+        }
+    }
 };
